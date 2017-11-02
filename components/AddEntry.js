@@ -1,7 +1,18 @@
 import React, { Component } from 'react'
-import {View,Text} from 'react-native'
-import { getMetricMetaInfo } from '../utils/helpers'
-
+import {View,Text,TouchableOpacity} from 'react-native'
+import { getMetricMetaInfo,timeToString } from '../utils/helpers'
+import UdaciSlider from './UdaciSlider'
+import UdaciSteppers from './UdaciSteppers'
+import DateHeader from './DateHeader'
+import TextButton from './TextButton'
+import {Ionicons} from '@expo/vector-icons'
+function SubmitBtn({onPress}){
+    return(
+        <TouchableOpacity onPress={onPress}>
+            <Text>Submit</Text>
+        </TouchableOpacity>
+    )
+}
 export default class AddEntry extends Component{
     state={
         run:0,
@@ -23,14 +34,14 @@ export default class AddEntry extends Component{
         })
     }
 
-    decrement=() =>{
+    decrement=(metric) =>{
         const {step}=getMetricMetaInfo(metric)
 
         this.setState((state) =>{
             const count=state[metric] - step
             return{
                 ...state,
-                [metric]:count
+                [metric]:count<0 ? 0 : count
             }
         })
     }
@@ -41,11 +52,65 @@ export default class AddEntry extends Component{
         }))
     }
 
-    render(){
-        return(
+    submit=() => {
+        const key=timeToString()
+        const entry=this.state
+
+        this.setState(() => ({
+            run: 0,
+            bike: 0,
+            swim: 0,
+            sleep: 0,
+            eat: 0
+        }))
+    }
+
+    reset=() =>{
+        const key=timeToString()
+
+    }
+    render() {
+        const metaInfo = getMetricMetaInfo()
+        if(true){
+            return(
+                <View>
+                    <Ionicons
+                     name={'ios-happy-outline'}
+                     size={100}
+                    />
+                    <Text>You already logged your information for today</Text>
+                    <TextButton onPress={this.reset}>
+                        Reset
+                    </TextButton>
+                </View>
+            )
+        }
+        return (
             <View>
-                <Text>This text is from component add entry</Text>
-                {getMetricMetaInfo('bike').getIcon()}
+                <DateHeader date={new Date().toLocaleDateString()} />
+                {Object.keys(metaInfo).map((key) => {
+                    const { getIcon, type, ...rest } = metaInfo[key]
+                    const value = this.state[key]
+
+                    return (
+                        <View key={key}>
+                            {getIcon()}
+                            {type === 'slider'
+                                ? <UdaciSlider
+                                    value={value}
+                                    onChange={(value) => this.slide(key, value)}
+                                    {...rest}
+                                />
+                                : <UdaciSteppers
+                                    value={value}
+                                    onIncrement={() => this.increment(key)}
+                                    onDecrement={() => this.decrement(key)}
+                                    {...rest}
+                                />}
+                        </View>
+                    )
+                })}
+                <SubmitBtn onPress={this.submit}/>
             </View>
         )
     }
