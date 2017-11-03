@@ -6,6 +6,7 @@ import UdaciSteppers from './UdaciSteppers'
 import DateHeader from './DateHeader'
 import TextButton from './TextButton'
 import {Ionicons} from '@expo/vector-icons'
+import {submitEntry,removeEntry} from './utils/api'
 function SubmitBtn({onPress}){
     return(
         <TouchableOpacity onPress={onPress}>
@@ -63,10 +64,13 @@ export default class AddEntry extends Component{
             sleep: 0,
             eat: 0
         }))
+
+        submitEntry({key,entry})
     }
 
     reset=() =>{
         const key=timeToString()
+        removeEntry({key})
 
     }
     render() {
