@@ -10,6 +10,7 @@ import {submitEntry,removeEntry} from '../utils/api'
 import {addEntry} from '../actions'
 import {connect} from 'react-redux'
 import {white,purple} from '../utils/colors'
+import {NavigationActions} from 'react-navigation'
 function SubmitBtn({onPress}){
     return(
         <TouchableOpacity style={Platform.OS==='ios' ? styles.iosSubmitButton : styles.androindSubmitButton}onPress={onPress}>
@@ -69,6 +70,8 @@ class AddEntry extends Component{
         }))
         this.props.addEntry({[key]:entry})
         submitEntry({key,entry})
+
+        this.toHome()
     }
 
     reset=() =>{
@@ -77,6 +80,10 @@ class AddEntry extends Component{
         this.props.addEntry({[key]:getDailyReminderValue()})
         removeEntry({key})
 
+    }
+
+    toHome=() =>{
+        this.props.navigation.dispatch(NavigationActions.back({key:'AddEntry'}))
     }
     render() {
         const metaInfo = getMetricMetaInfo()
